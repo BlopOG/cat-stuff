@@ -1,7 +1,7 @@
 import * as Carousel from "./Carousel.js";
 
 // DOM elements and API key
-const  API_KEY = "secret key hehe";
+const API_KEY = "secret key hehe";
 const breedSelect = document.getElementById("breedSelect");
 const infoDump = document.getElementById("infoDump");
 const progressBar = document.getElementById("progressBar");
@@ -93,6 +93,22 @@ Carousel.appendCarouselItem(slide);
   Carousel.start();
 }
 
+// Fetch images for selected breed and build carousel
+export async function handleBreedSelect() {
+  const breedId = breedSelect.value;
+  if (!breedId) return;
+
+  try {
+    const res = await axios.get(`/images/search?limit=5&breed_ids=${breedId}`, {
+      onDownloadProgress: updateProgress,
+    });
+    buildCarousel(res.data);
+  } catch (err) {
+    console.error("Error fetching breed images:", err);
+    infoDump.innerHTML = "<p>Could not load images for this breed.</p>";
+  }
+}
+
 // Populate drop-down on load
 export async function initialLoad() {
   try {
@@ -117,6 +133,26 @@ export async function initialLoad() {
   } catch (err) {
     console.error("Failed to load breed list:", err);
     infoDump.innerHTML = "<p>Could not load breeds.</p>";
+  }
+}
+
+// Favorite / Unfavorite toggle add 
+export async function favourite(imgId) {
+  try {
+    if (favsMap[imgId]) {
+      const favId = favsMap[imgId];
+      await axios.delete("/favourites/" + favId);
+      delete favsMap[imgId];
+      console.log("Removed fav:", imgId);
+    } else {
+      const res = await axios.post("/favourites", {
+        image_id: imgId,
+      });
+      favsMap[imgId] = res.data.id;
+      console.log("Added fav:", imgId);
+    }
+  } catch (err) {
+    console.error("Fav toggle error:", err);
   }
 }
 
