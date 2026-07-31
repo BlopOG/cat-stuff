@@ -75,5 +75,50 @@ function buildCarousel(items) {
     } else {
       slide.classList.remove("active");
     }
+Carousel.appendCarouselItem(slide);
+  }
+
+  // Fill out breed info box using the first image
+  const firstCat = items[0];
+  if (firstCat && firstCat.breeds && firstCat.breeds.length > 0) {
+    const breed = firstCat.breeds[0];
+    infoDump.innerHTML = `
+      <h2>${breed.name}</h2>
+      <p><strong>Origin:</strong> ${breed.origin || "Unknown"}</p>
+      <p><strong>Temperament:</strong> ${breed.temperament || "N/A"}</p>
+      <p>${breed.description || "No description provided."}</p>
+    `;
+  }
+
+  Carousel.start();
+}
+
+// Populate drop-down on load
+export async function initialLoad() {
+  try {
+    const res = await axios.get("/breeds", {
+      onDownloadProgress: updateProgress,
+    });
+
+    const breeds = res.data;
+    breedSelect.innerHTML = '<option value="" disabled selected>Select a breed...</option>';
+
+    for (let i = 0; i < breeds.length; i++) {
+      const opt = document.createElement("option");
+      opt.value = breeds[i].id;
+      opt.textContent = breeds[i].name;
+      breedSelect.appendChild(opt);
+    }
+
+    if (breeds.length > 0) {
+      breedSelect.value = breeds[0].id;
+      handleBreedSelect();
+    }
+  } catch (err) {
+    console.error("Failed to load breed list:", err);
+    infoDump.innerHTML = "<p>Could not load breeds.</p>";
+  }
+}
+
 
    
