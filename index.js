@@ -25,3 +25,55 @@ axios.interceptors.request.use((config) => {
   document.body.style.cursor = "progress";
   return config;
 });
+// Response Interceptor
+axios.interceptors.response.use(
+  (res) => {
+    const timeTaken = new Date().getTime() - res.config.startTime;
+    console.log("Done in " + timeTaken + "ms");
+
+    document.body.style.cursor = "default";
+    return res;
+  },
+  (err) => {
+    document.body.style.cursor = "default";
+    return Promise.reject(err);
+  }
+);
+// Update loading progress bar
+function updateProgress(e) {
+  if (e.lengthComputable && progressBar) {
+    const percent = Math.round((e.loaded * 100) / e.total);
+    progressBar.style.width = percent + "%";
+  } else if (progressBar) {
+    progressBar.style.width = "100%";
+  }
+}
+
+
+function buildCarousel(items) {
+  Carousel.clear();
+  infoDump.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    infoDump.innerHTML = "<p>No images found.</p>";
+    return;
+  }
+
+  // Loop through images and add slides
+  for (let i = 0; i < items.length; i++) {
+    const cat = items[i];
+    
+    let catName = "Cat Image";
+    if (cat.breeds && cat.breeds.length > 0 && cat.breeds[0].name) {
+      catName = cat.breeds[0].name;
+    }
+
+    const slide = Carousel.createCarouselItem(cat.url, catName, cat.id);
+
+    if (i === 0) {
+      slide.classList.add("active");
+    } else {
+      slide.classList.remove("active");
+    }
+
+   

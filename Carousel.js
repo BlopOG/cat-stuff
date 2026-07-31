@@ -1,4 +1,3 @@
-import * as bootstrap from "bootstrap";
 import { favourite } from "./index.js";
 
 export function createCarouselItem(imgSrc, imgAlt, imgId) {
@@ -23,8 +22,7 @@ export function clear() {
     carousel.removeChild(carousel.firstChild);
   }
 }
-
-export function appendCarousel(element) {
+export function appendCarouselItem(element) {
   const carousel = document.querySelector("#carouselInner");
 
   const activeItem = document.querySelector(".carousel-item.active");
