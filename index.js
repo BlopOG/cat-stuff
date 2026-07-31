@@ -157,4 +157,40 @@ export async function favourite(imgId) {
 }
 
 
-   
+   export async function getFavourites() {
+  try {
+    const res = await axios.get("/favourites", {
+      onDownloadProgress: updateProgress,
+    });
+
+    const favsList = res.data;
+    const formatted = [];
+
+    for (let i = 0; i < favsList.length; i++) {
+      const item = favsList[i];
+      favsMap[item.image_id] = item.id;
+
+      if (item.image) {
+        formatted.push({
+          id: item.image_id,
+          url: item.image.url,
+        });
+      }
+    }
+
+    buildCarousel (formatted);
+    infoDump.innerHTML = "<h2>Your Favourites</h2><p>Click any heart to remove it from favorites.</p>";
+  } catch (err) {
+    console.error("Error getting favourites:", err);
+  }
+}
+
+
+breedSelect.addEventListener("change", handleBreedSelect);
+
+if (favsBtn) {
+  favsBtn.addEventListener("click", getFavourites);
+}
+
+initialLoad();
+
